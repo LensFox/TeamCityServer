@@ -1,0 +1,5 @@
+﻿data_dir/system/caches/git
+teamcity-server-logs
+buildserver_pgdata
+data_dir/config/_logging
+data_dir/system
