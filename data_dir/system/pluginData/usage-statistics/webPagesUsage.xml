@@ -1,0 +1,12 @@
+<root>
+  <page path="/limitedPendingChangesLink.html" />
+  <page path="/viewLog.html?tab=buildResultsDiv" />
+  <page path="/problems/exitCodeProblemAjax.html" />
+  <page path="/admin/editBuild.html" />
+  <page path="/changesLink.html" />
+  <page path="/admin/buildTypeHealthStatusItems.html" />
+  <page path="/viewType.html" />
+  <page path="/buildTypeHealthStatusItems.html" />
+  <page path="/admin/editBuildRunners.html" />
+  <page path="/" />
+</root>

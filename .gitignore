@@ -1,5 +1,9 @@
-﻿data_dir/system/caches/git
-teamcity-server-logs
-buildserver_pgdata
+﻿# data_dir/system/caches/git
+# teamcity-server-logs
+# buildserver_pgdata
+# data_dir/config/_logging
+# data_dir/system
 data_dir/config/_logging
-data_dir/system
+data_dir/system/artifacts/ClientsService/Build
+data_dir/system/caches
+teamcity-server-logs

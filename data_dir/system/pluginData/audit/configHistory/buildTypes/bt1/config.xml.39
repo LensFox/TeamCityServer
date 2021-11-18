@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build-type xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" uuid="49aef097-c805-4b11-a2e3-79b73ecc9afa" xsi:noNamespaceSchemaLocation="https://www.jetbrains.com/teamcity/schemas/2021.1/project-config.xsd">
+  <name>Build</name>
+  <description />
+  <settings>
+    <options>
+      <option name="artifactRules" value="output =&gt; output" />
+      <option name="publishArtifactCondition" value="SUCCESSFUL" />
+    </options>
+    <parameters />
+    <build-runners>
+      <runner id="RUNNER_1" name="Dotnet Restore" type="dotnet">
+        <parameters>
+          <param name="args" value="-s https://api.nuget.org/v3/index.json" />
+          <param name="command" value="restore" />
+          <param name="dotNetCoverage.dotCover.home.path" value="%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%" />
+          <param name="paths" value="ClientService.Server/ClientsService/ClientsService.sln" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
+      <runner id="RUNNER_2" name="Dotnet Publish" type="dotnet">
+        <parameters>
+          <param name="command" value="publish" />
+          <param name="configuration" value="Release" />
+          <param name="dotNetCoverage.dotCover.home.path" value="%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%" />
+          <param name="outputDir" value="packages" />
+          <param name="paths" value="ClientService.Server/ClientsService/ClientsService.sln" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="verbosity" value="Detailed" />
+        </parameters>
+      </runner>
+      <runner id="RUNNER_4" name="Dotnet Tests" type="dotnet">
+        <parameters>
+          <param name="command" value="test" />
+          <param name="dotNetCoverage.dotCover.home.path" value="%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%" />
+          <param name="paths" value="ClientService.Server/ClientsService/ClientsService.BLL.Tests/ClientsService.BLL.Tests.csproj ClientService.Server/ClientsService/ClientsService.DDL.Tests/ClientsService.DDL.Tests.csproj ClientService.Server/ClientsService/ClientsService.Web.Tests/ClientsService.Web.Tests.csproj" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
+      <runner id="RUNNER_6" name="Dotnet Pack" type="dotnet">
+        <parameters>
+          <param name="command" value="pack" />
+          <param name="dotNetCoverage.dotCover.home.path" value="%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%" />
+          <param name="outputDir" value="output" />
+          <param name="paths" value="ClientService.Server/ClientsService/ClientsService.sln" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
+      <runner id="RUNNER_9" name="Yarn install" type="simpleRunner">
+        <parameters>
+          <param name="plugin.docker.imageId" value="node:latest" />
+          <param name="plugin.docker.imagePlatform" value="linux" />
+          <param name="plugin.docker.pull.enabled" value="true" />
+          <param name="script.content"><![CDATA[#!/bin/bash
+set -e -x
+
+cd ClientService.UI\clients-service
+yarn
+yarn build]]></param>
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <vcs-settings>
+      <vcs-entry-ref root-id="ClientsService_HttpsGithubComLensFoxClientsServiceRefsHeadsMaster" />
+    </vcs-settings>
+    <requirements />
+    <build-triggers>
+      <build-trigger id="TRIGGER_1" type="vcsTrigger">
+        <parameters>
+          <param name="branchFilter" value="+:*" />
+          <param name="perCheckinTriggering" value="true" />
+          <param name="quietPeriodMode" value="DO_NOT_USE" />
+        </parameters>
+      </build-trigger>
+    </build-triggers>
+    <cleanup />
+  </settings>
+</build-type>
+
