@@ -1,12 +1,18 @@
 <root>
-  <page path="/limitedPendingChangesLink.html" />
+  <page path="/limitedPendingChangesLink.html">
+    <usage userId="1" timestamp="1637933638853" />
+  </page>
   <page path="/viewLog.html?tab=buildResultsDiv" />
   <page path="/problems/exitCodeProblemAjax.html" />
   <page path="/admin/editBuild.html" />
-  <page path="/changesLink.html" />
+  <page path="/changesLink.html">
+    <usage userId="1" timestamp="1637933639325" />
+  </page>
   <page path="/admin/buildTypeHealthStatusItems.html" />
   <page path="/viewType.html" />
   <page path="/buildTypeHealthStatusItems.html" />
   <page path="/admin/editBuildRunners.html" />
-  <page path="/" />
+  <page path="/">
+    <usage userId="1" timestamp="1637933622011" />
+  </page>
 </root>

@@ -1,5 +1,4 @@
-version: '3.1'
-
+version: "3.1"
 
 # Default ${TEAMCITY_VERSION} is defined in .env file
 
@@ -11,7 +10,7 @@ version: '3.1'
 
 services:
   db:
-    image: postgres:latest
+    image: postgres:13
     restart: always
     environment:
       - POSTGRES_PASSWORD=teamcity_password
@@ -32,7 +31,7 @@ services:
       - ./teamcity-server-logs:/opt/teamcity/logs
     depends_on:
       - db
-      
+
   teamcity-agent-1:
     image: jetbrains/teamcity-agent:${TEAMCITY_VERSION}-linux-sudo
     privileged: true
@@ -42,7 +41,7 @@ services:
       - DOCKER_IN_DOCKER=start
       - SERVER_URL=teamcity:8111
     depends_on:
-    - teamcity
+      - teamcity
   teamcity-agent-2:
     image: jetbrains/teamcity-agent:${TEAMCITY_VERSION}-linux-sudo
     privileged: true
@@ -52,4 +51,80 @@ services:
       - DOCKER_IN_DOCKER=start
       - SERVER_URL=teamcity:8111
     depends_on:
-    - teamcity
+      - teamcity
+
+  db-octopus:
+    image: mcr.microsoft.com/mssql/server
+    environment:
+      SA_PASSWORD: ${SA_PASSWORD}
+      ACCEPT_EULA: "Y"
+    ports:
+      - 1401:1433
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "/opt/mssql-tools/bin/sqlcmd",
+          "-U",
+          "sa",
+          "-P",
+          "${SA_PASSWORD}",
+          "-Q",
+          "select 1",
+        ]
+      interval: 10s
+      retries: 10
+    volumes:
+      - sqlvolume:/var/opt/mssql
+    restart: always
+
+  octopus-server:
+    image: docker.packages.octopushq.com/octopusdeploy/octopusdeploy:latest
+    depends_on:
+      - db-octopus
+    environment:
+      ACCEPT_EULA: "Y"
+      DB_CONNECTION_STRING: Server=db-octopus,1433;Database=OctopusDeploy;User=sa;Password=${SA_PASSWORD}
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      SKIP_IMPORT_VERSION_CHECK: "true"
+      OCTOPUS_SERVER_BASE64_LICENSE: ""
+      MASTER_KEY: "vkLjnBM56jn3NCptEkqJIw=="
+      IMPORT_PASSWORD: "${ADMIN_PASSWORD}"
+    ports:
+      - "8080:8080"
+      - "10943:10943"
+    volumes:
+      - repository:/repository
+      - artifacts:/artifacts
+      - taskLogs:/taskLogs
+      - cache:/cache
+      - import:/import
+    restart: always
+
+  listening-tentacle:
+    image: docker.packages.octopushq.com/octopusdeploy/tentacle:6.0.0
+    depends_on:
+      - octopus-server
+    environment:
+      ACCEPT_EULA: "Y"
+      ServerUsername: ${ADMIN_USERNAME}
+      ServerPassword: ${ADMIN_PASSWORD}
+      TargetEnvironment: "Development"
+      TargetRole: "app-server"
+      ServerUrl: "http://octopus-server:8080"
+      ServerApiKey: "vkLjnBM56jn3NCptEkqJIw=="
+    stdin_open: true #Process sits and waits for ReadLine
+    volumes:
+      - "./docker/Volumes/listening-tentacle/Applications:/Applications"
+      - "./docker/Volumes/listening-tentacle/TentacleHome:/TentacleHome"
+    restart: always
+volumes:
+  repository:
+  artifacts:
+  taskLogs:
+  cache:
+  import:
+  sqlvolume:
+  host-tentacle-HostTentacleApplications:
+  host-tentacle-HostTentacleHome:
